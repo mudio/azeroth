@@ -1,0 +1,24 @@
+{
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "extends": "airbnb-base",
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "indent": [2, 4],
+    "max-len": [2, 120],
+    "consistent-return":"off",
+    "no-underscore-dangle": "off",
+    "object-curly-spacing": "off",
+    "class-methods-use-this": "off",
+    "no-param-reassign": "off"
+  },
+  "plugins": [
+    "import"
+  ]
+}
