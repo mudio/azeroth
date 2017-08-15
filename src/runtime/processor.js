@@ -12,9 +12,9 @@ import {
     isController,
     isMiddleware,
     AutowiredKeys, HeaderKeys,
-} from './types';
-import {error} from './logger';
-import {getServiceRepository} from './context';
+} from '../types';
+import {error} from '../logger';
+import {getServiceRepository} from '../context';
 
 const __serviceCache = getServiceRepository();
 

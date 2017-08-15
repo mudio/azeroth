@@ -15,7 +15,7 @@ export const searchCache = (moduleName, callback) => {
 
     // Check if the module has been resolved and found within
     // the cache
-    if (mod && ((mod = require.cache[mod]) !== undefined)) {
+    if (mod && ((mod = require.cache[mod]) !== undefined)) { // eslint-disable-line no-cond-assign
         // Recursively go over the results
         (function traverse(_mod) {
             // Go over each of the module's children and

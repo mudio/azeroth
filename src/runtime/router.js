@@ -8,9 +8,9 @@
 import _ from 'lodash';
 
 import Processor from './processor';
-import {RouteCategory} from './types';
-import {Http404, Http405} from './error';
-import {getControllerRepository} from './context';
+import {RouteCategory} from '../types';
+import {Http404, Http405} from '../httpcode';
+import {getControllerRepository} from '../context';
 
 export default class Router {
     /**

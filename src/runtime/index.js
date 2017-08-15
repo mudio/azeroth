@@ -11,14 +11,14 @@ import glob from 'glob';
 import http from 'http';
 import connect from 'connect';
 
-import Router from '../router';
-import {Http500} from '../error';
-import Processor from '../processor';
-import {MiddlewareCategory} from '../types';
+import Router from './router';
+import {info} from '../logger';
+import {Http500} from '../httpcode';
+import Processor from './processor';
+import {RouteCategory, MiddlewareCategory} from '../types';
 import {
-    register,
-    registerServiceAlias,
-    getMiddlewareRepository,
+    register, registerServiceAlias,
+    getMiddlewareRepository, getServiceRepository, getControllerRepository,
 } from '../context';
 
 export default class Runtime {
@@ -28,24 +28,36 @@ export default class Runtime {
 
         this._workspace = workspace;
         this._plugins = plugins;
-        this._services = services;
+        this._serviceAlisa = services.alias;
         this._denyAnonymousMiddleware = denyAnonymous;
         this._middlewareMapping = match;
     }
 
     run() {
+        /**
+         * 编译模块
+         */
         this.compile();
+
+        /**
+         * 处理一些准备工作
+         */
         this.link();
+
+        /**
+         * 分析加载情况
+         */
+        this.analysis();
 
         const app = connect();
 
         /**
-         * connect plugin register
+         * 注册插件
          */
         this._plugins.forEach(plugin => app.use(plugin));
 
         /**
-         * dispatch middleware
+         * 注册中间件
          */
         this._middlewares.forEach((_ClassType) => {
             const _Middleware = Processor.Autowire(_ClassType);
@@ -61,7 +73,7 @@ export default class Runtime {
         });
 
         /**
-         * dispatch controller
+         * 分发路由
          */
         app.use(async (req, res) => {
             let content = null;
@@ -101,15 +113,22 @@ export default class Runtime {
 
     link() {
         this._ruoter = new Router();
+
         this._middlewares = getMiddlewareRepository();
 
         /**
          * 去除匿名的中间件
          */
         if (this._denyAnonymousMiddleware) {
-            this._middlewares = this._middlewares.filter(
-                _middleware => !!_middleware[MiddlewareCategory].name,
-            );
+            this._middlewares = this._middlewares.map((_middleware) => {
+                const category = _middleware[MiddlewareCategory];
+
+                if (!category.name) {
+                    category.disabled = true;
+                }
+
+                return _middleware;
+            });
         }
 
         /**
@@ -133,6 +152,48 @@ export default class Runtime {
             });
         }
 
-        registerServiceAlias(this._services.alias);
+        /**
+         * 处理服务别名
+         */
+        registerServiceAlias(this._serviceAlisa);
+    }
+
+    analysis() {
+        info('=============== load middlewares ===============');
+        this._middlewares.forEach((_middleware) => {
+            const category = _middleware[MiddlewareCategory];
+            info(
+                [
+                    `load middleware => ${_middleware.name}`,
+                    `alias = ${category.name || 'anonymous'}`,
+                    `disabled = ${!!category.disabled}`,
+                    `path = ${category.path || '/'}`,
+                ].join(', '),
+            );
+        });
+
+        info('=============== load services ==================');
+        const services = getServiceRepository();
+        Object.entries(services).forEach((entry) => {
+            const [alias, _service] = entry;
+            info(
+                [
+                    `load service => ${_service.name}`,
+                    `alias = ${alias || 'anonymous'}`,
+                ].join(', '),
+            );
+        });
+
+        info('=============== load controllers ===============');
+        const controllers = getControllerRepository();
+        Object.values(controllers).forEach((_controller) => {
+            const category = _controller[RouteCategory];
+            info(
+                [
+                    `load controller => ${_controller.name}`,
+                    `path = ${['', ...category].join('/')}`,
+                ].join(', '),
+            );
+        });
     }
 }

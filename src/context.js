@@ -15,7 +15,7 @@ import {
 import {warn} from './logger';
 
 const __middlewareCache = [];
-const __serviceCache = [];
+const __serviceCache = {};
 const __controllerCache = {};
 
 /**
