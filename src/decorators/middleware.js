@@ -6,14 +6,21 @@
  */
 
 import _ from 'lodash';
-import {MiddlewareCategory} from '../types';
 
-export default middlewareName => (Constructor, name) => {
+import {normalizeArgs} from '../utils';
+import {MiddlewareCategory} from '../types';
+import {registerMiddleware} from '../context';
+
+export default (...args) => (Constructor, name) => {
     if (name) {
         throw new Error('Decorator `Middleware` only support classType');
     }
 
-    Constructor[MiddlewareCategory] = _.defaults(middlewareName, {path: ''});
+    const _args = normalizeArgs(...args);
+
+    Constructor[MiddlewareCategory] = _.flatten(_args);
+
+    registerMiddleware(Constructor);
 
     return Constructor;
 };

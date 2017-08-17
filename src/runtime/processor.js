@@ -11,6 +11,7 @@ import {
     isService,
     isController,
     isMiddleware,
+    isInterceptor,
     AutowiredKeys, HeaderKeys,
 } from '../types';
 import {error} from '../logger';
@@ -87,6 +88,18 @@ export default class Processor {
             }
 
             return ClassType;
+        }
+
+        if (isInterceptor(ClassType)) {
+            const interceptor = new ClassType(...args);
+
+            if (AutowiredKeys in ClassType) {
+                ClassType[AutowiredKeys].forEach((name) => {
+                    interceptor[name] = Processor.AutowireService(__serviceCache[name]);
+                });
+            }
+
+            return interceptor;
         }
 
         if (isService(ClassType)) {

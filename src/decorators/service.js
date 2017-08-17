@@ -6,6 +6,7 @@
  */
 
 import {ServiceCategory} from '../types';
+import {registerService} from '../context';
 
 export default serviceName => (Constructor, name) => {
     if (name) {
@@ -13,6 +14,8 @@ export default serviceName => (Constructor, name) => {
     }
 
     Constructor[ServiceCategory] = serviceName;
+
+    registerService(Constructor);
 
     return Constructor;
 };

@@ -10,6 +10,7 @@ import _service from './decorators/service';
 import _autowired from './decorators/autowired';
 import _middleware from './decorators/middleware';
 import _controller from './decorators/controller';
+import _interceptor from './decorators/interceptor';
 import {
     PostMethod, GetMethod, PutMethod, DeleteMethod,
 } from './decorators/method';
@@ -23,3 +24,4 @@ export const Service = _service;
 export const Autowired = _autowired;
 export const Middleware = _middleware;
 export const Controller = _controller;
+export const Interceptor = _interceptor;

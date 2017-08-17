@@ -6,7 +6,6 @@
  */
 
 import _ from 'lodash';
-import path from 'path';
 import glob from 'glob';
 import http from 'http';
 import connect from 'connect';
@@ -15,9 +14,10 @@ import Router from './router';
 import {info} from '../logger';
 import {Http500} from '../httpcode';
 import Processor from './processor';
-import {RouteCategory, MiddlewareCategory} from '../types';
+import {isHttpError} from '../utils';
+import {RouteKeys, MiddlewareCategory} from '../types';
 import {
-    register, registerServiceAlias,
+    registerServiceAlias,
     getMiddlewareRepository, getServiceRepository, getControllerRepository,
 } from '../context';
 
@@ -61,11 +61,11 @@ export default class Runtime {
          */
         this._middlewares.forEach((_ClassType) => {
             const _Middleware = Processor.Autowire(_ClassType);
-            const category = _Middleware[MiddlewareCategory];
+            const [name, config = {}] = _Middleware[MiddlewareCategory]; // eslint-disable-line no-unused-vars
 
-            if (!category.disabled) {
-                if (category.path) {
-                    app.use(category.path, (...args) => _Middleware.invoke(...args));
+            if (!config.disabled) {
+                if (config.path) {
+                    app.use(config.path, (...args) => _Middleware.invoke(...args));
                 } else {
                     app.use((...args) => _Middleware.invoke(...args));
                 }
@@ -81,11 +81,15 @@ export default class Runtime {
             try {
                 content = await this._ruoter.dispatch(req, res);
             } catch (ex) {
-                content = new Http500(ex.message);
+                if (isHttpError(ex)) {
+                    content = ex;
+                } else {
+                    content = new Http500(ex.message);
+                }
             }
 
             if (!res.finished) {
-                if (_.isError(content)) {
+                if (isHttpError(content)) {
                     res.writeHead(content.HttpCode);
                     res.end(content.HttpMessage);
                 } else if (_.isObject(content)) {
@@ -104,10 +108,10 @@ export default class Runtime {
 
         filePaths.forEach((relativePath) => {
             // delete require.cache[require.resolve(module)];
-            const absolutePath = path.join(process.cwd(), relativePath);
+            // const absolutePath = path.join(process.cwd(), relativePath);
             const _module = require.main.require(relativePath);    // eslint-disable-line
 
-            register(_module.__esModule ? _module.default : _module, absolutePath);
+            // register(_module.__esModule ? _module.default : _module, absolutePath);
         });
     }
 
@@ -121,10 +125,11 @@ export default class Runtime {
          */
         if (this._denyAnonymousMiddleware) {
             this._middlewares = this._middlewares.map((_middleware) => {
-                const category = _middleware[MiddlewareCategory];
+                const [name, config = {}] = _middleware[MiddlewareCategory];
 
-                if (!category.name) {
-                    category.disabled = true;
+                if (!name) {
+                    config.disabled = true;
+                    _middleware[MiddlewareCategory] = [name, config];
                 }
 
                 return _middleware;
@@ -136,16 +141,18 @@ export default class Runtime {
          */
         if (Object.keys(this._middlewareMapping).length > -1) {
             this._middlewares = this._middlewares.map((_ClassType) => {
-                const category = _ClassType[MiddlewareCategory];
+                const [name, config = {}] = _ClassType[MiddlewareCategory];
 
-                if (category.name in this._middlewareMapping) {
-                    const enabled = this._middlewareMapping[category.name];
+                if (name in this._middlewareMapping) {
+                    const enabled = this._middlewareMapping[name];
 
                     if (!enabled) {
-                        category.disabled = true;
+                        config.disabled = true;
                     }
 
-                    category.path = enabled;
+                    config.path = enabled;
+
+                    _ClassType[MiddlewareCategory] = [name, config];
                 }
 
                 return _ClassType;
@@ -161,13 +168,13 @@ export default class Runtime {
     analysis() {
         info('=============== load middlewares ===============');
         this._middlewares.forEach((_middleware) => {
-            const category = _middleware[MiddlewareCategory];
+            const [name, config = {}] = _middleware[MiddlewareCategory];
             info(
                 [
                     `load middleware => ${_middleware.name}`,
-                    `alias = ${category.name || 'anonymous'}`,
-                    `disabled = ${!!category.disabled}`,
-                    `path = ${category.path || '/'}`,
+                    `alias = ${name || 'anonymous'}`,
+                    `disabled = ${!!config.disabled}`,
+                    `path = ${config.path || '/'}`,
                 ].join(', '),
             );
         });
@@ -187,7 +194,7 @@ export default class Runtime {
         info('=============== load controllers ===============');
         const controllers = getControllerRepository();
         Object.values(controllers).forEach((_controller) => {
-            const category = _controller[RouteCategory];
+            const category = _controller[RouteKeys];
             info(
                 [
                     `load controller => ${_controller.name}`,

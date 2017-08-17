@@ -19,6 +19,8 @@ export const AutowiredKeys = Symbol.for('AutowiredKeys');
 
 export const HeaderKeys = Symbol.for('HeaderKeys');
 
+export const InterceptorKeys = Symbol.for('InterceptorKeys');
+
 export const MiddlewareCategory = Symbol.for('MiddlewareCategory');
 export const isMiddleware = _type => assertType(_type, MiddlewareCategory);
 
@@ -28,11 +30,11 @@ export const isService = _type => assertType(_type, ServiceCategory);
 export const ControllerCategory = Symbol.for('ControllerCategory');
 export const isController = _type => assertType(_type, ControllerCategory);
 
-export const ComponentCategory = Symbol.for('ComponentCategory');
-export const isComponent = _type => assertType(_type, ComponentCategory);
+export const InterceptorCategory = Symbol.for('InterceptorCategory');
+export const isInterceptor = _type => assertType(_type, InterceptorCategory);
 
-export const RouteCategory = Symbol.for('RouteCategory');
-export const hasRoute = _type => assertType(_type, RouteCategory);
+export const RouteKeys = Symbol.for('RouteKeys');
+export const hasRoute = _type => assertType(_type, RouteKeys);
 
 export const MethodCategory = Symbol.for('MethodCategory');
 export const hasMethod = _type => assertType(_type, MethodCategory);

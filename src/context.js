@@ -11,12 +11,14 @@ import {
     ServiceCategory,
     MiddlewareCategory,
     ControllerCategory,
+    InterceptorCategory,
 } from './types';
 import {warn} from './logger';
 
 const __middlewareCache = [];
 const __serviceCache = {};
-const __controllerCache = {};
+const __controllerCache = [];
+const __interceptorCache = {};
 
 /**
  * 注册中间件
@@ -24,7 +26,7 @@ const __controllerCache = {};
  * @param {IMiddleware} classType
  */
 export const registerMiddleware = (classType) => {
-    const {name} = classType[MiddlewareCategory];
+    const [name] = classType[MiddlewareCategory];
     // 匿名服务
     if (!name) {
         const index = _.findIndex(__middlewareCache, _Type => classType === _Type);
@@ -77,8 +79,13 @@ export const registerServiceAlias = (aliasMapping = {}) => {
  * @param {IController} classType
  * @param {String} filePath
  */
-export const registerController = (classType, filePath) => {
-    __controllerCache[filePath] = classType;
+export const registerController = (_ClassType) => {
+    __controllerCache.push(_ClassType);
+};
+
+export const registerInterceptor = (_ClassType) => {
+    const category = _ClassType[InterceptorCategory];
+    __interceptorCache[category] = _ClassType;
 };
 
 /**
@@ -99,8 +106,14 @@ export const register = (classType, ...args) => {
     if (ServiceCategory in classType) {
         registerService(classType, ...args);
     }
+
+    if (InterceptorCategory in classType) {
+        registerInterceptor(classType, ...args);
+    }
 };
 
 export const getServiceRepository = () => __serviceCache;
 export const getMiddlewareRepository = () => Object.values(__middlewareCache);
 export const getControllerRepository = () => __controllerCache;
+export const getInterceptor = name => __interceptorCache[name];
+

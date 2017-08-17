@@ -8,9 +8,9 @@
 import _ from 'lodash';
 
 import Processor from './processor';
-import {RouteCategory} from '../types';
 import {Http404, Http405} from '../httpcode';
-import {getControllerRepository} from '../context';
+import {getInterceptor, getControllerRepository} from '../context';
+import {InterceptorKeys, RouteKeys} from '../types';
 
 export default class Router {
     /**
@@ -32,17 +32,17 @@ export default class Router {
 
         for (let index = 0; index < _classTypes.length; index += 1) {
             const _classType = _classTypes[index];
-            const routeHandler = _classType[RouteCategory];
+            const routeHandler = _classType[RouteKeys];
 
             if (_.isFunction(routeHandler) && routeHandler(pathname)) {
-                return this.executeAction(_classType, req, res);
+                return this.findAction(_classType, req, res);
             }
 
             const prefixs = pathname.split('/').slice(1, 1 + routeHandler.length);
             const isMatch = _.every(routeHandler, (v, k) => prefixs[k] === v);
 
             if (isMatch) {
-                return this.executeAction(_classType, req, res);
+                return this.findAction(_classType, req, res);
             }
         }
 
@@ -58,12 +58,12 @@ export default class Router {
      * @returns
      * @memberof Router
      */
-    executeAction(_classType, req, res) {
+    findAction(_classType, req, res) {
         const pathname = req.url;
         const method = req.method;
+        const routeHandler = _classType[RouteKeys];
+        const handlers = _classType[Symbol.for(method)];
         const controller = Processor.Autowire(_classType, req, res);
-        const handlers = controller.constructor[Symbol.for(method)];
-        const routeHandler = controller.constructor[RouteCategory];
 
         for (let index = 0; index < handlers.length; index += 1) {
             const {match, key} = handlers[index];
@@ -71,17 +71,56 @@ export default class Router {
              * 如果是函数，则执行匹配
              */
             if (_.isFunction(match) && match(pathname)) {
-                return controller[key]();
+                return this.invokeAction(controller, key, req, res);
             }
 
             if (_.isArray(routeHandler)) {
                 const targetUrl = ['', ...routeHandler, ...match].join('/');
                 if (targetUrl === pathname) {
-                    return controller[key]();
+                    return this.invokeAction(controller, key, req, res);
                 }
             }
         }
 
         return new Http405();
+    }
+
+    invokeAction(target, key, req, res) {
+        const _classType = target.constructor;
+        const category = _classType[InterceptorKeys];
+        const interceptors = _.uniqBy([...category[key], ...category], item => item[0]);
+
+        /**
+         * Interceptor如果发生异常或者返回结果，都会组织后续的行为
+         */
+        async function invokeInterceptor(iterator) {
+            const {done, value} = iterator.next();
+
+            if (done) {
+                return;
+            }
+
+            const [name, ...args] = value;
+            const _interceptorClass = getInterceptor(name);
+            const interceptor = Processor.Autowire(_interceptorClass, ...args);
+
+            const content = await interceptor.before(req, res);
+
+            if (!_.isUndefined(content)) {
+                return content;
+            }
+
+            return invokeInterceptor(iterator);
+        }
+
+        const iterator = interceptors[Symbol.iterator]();
+
+        return invokeInterceptor(iterator).then((content) => {
+            if (!_.isUndefined(content)) {
+                return content;
+            }
+
+            return target[key]();
+        });
     }
 }

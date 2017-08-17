@@ -7,11 +7,8 @@
 
 import _ from 'lodash';
 
-import {
-    RouteCategory,
-    ControllerCategory,
-} from '../types';
-
+import {RouteKeys} from '../types';
+import {registerController} from '../context';
 
 export default (rule = '/') => (Constructor, name) => {
     if (name) {
@@ -24,14 +21,14 @@ export default (rule = '/') => (Constructor, name) => {
      * 最终以`Array<String>|Func`形式保存
      */
     if (_.isArray(rule) || _.isFunction(rule)) {
-        Constructor[RouteCategory] = rule;
+        Constructor[RouteKeys] = rule;
     } else if (_.isString(rule)) {
-        Constructor[RouteCategory] = _.compact(rule.split('/'));
+        Constructor[RouteKeys] = _.compact(rule.split('/'));
     } else {
         throw new Error('Decorator `Controller` `Rule` must be String|Array|Func');
     }
 
-    Constructor[ControllerCategory] = true;
+    registerController(Constructor);
 
     return Constructor;
 };
