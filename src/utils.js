@@ -22,3 +22,5 @@ export const normalizeArgs = (...args) => _.map(args, (item) => {
 });
 
 export const isHttpError = err => _.isError(err) && ('HttpCode' in err);
+
+export const isNullValue = v => _.isUndefined(v) || _.isNull(v);

@@ -8,9 +8,10 @@
 import _ from 'lodash';
 
 import Processor from './processor';
+import {isNullValue} from '../utils';
 import {Http404, Http405} from '../httpcode';
-import {getInterceptor, getControllerRepository} from '../context';
 import {InterceptorKeys, RouteKeys} from '../types';
+import {getInterceptor, getControllerRepository} from '../context';
 
 export default class Router {
     /**
@@ -88,7 +89,9 @@ export default class Router {
     invokeAction(target, key, req, res) {
         const _classType = target.constructor;
         const category = _classType[InterceptorKeys];
-        const interceptors = _.uniqBy([...category[key], ...category], item => item[0]);
+        const actionCategory = category[key] || [];
+
+        const interceptors = _.uniqBy([...actionCategory, ...category], item => item[0]);
 
         /**
          * Interceptor如果发生异常或者返回结果，都会组织后续的行为
@@ -106,7 +109,7 @@ export default class Router {
 
             const content = await interceptor.before(req, res);
 
-            if (!_.isUndefined(content)) {
+            if (!isNullValue(content)) {
                 return content;
             }
 
@@ -116,7 +119,7 @@ export default class Router {
         const iterator = interceptors[Symbol.iterator]();
 
         return invokeInterceptor(iterator).then((content) => {
-            if (!_.isUndefined(content)) {
+            if (!isNullValue(content)) {
                 return content;
             }
 
