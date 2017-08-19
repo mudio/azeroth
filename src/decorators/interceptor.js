@@ -16,6 +16,10 @@ import {
     InterceptorCategory,
 } from '../types';
 
+/**
+ * InterceptorKeys Array<InterceptorName>           放置类装饰器
+ * InterceptorKeys Object<Method, InterceptorName>  放置方法装饰器
+ */
 export default (...args) => (target, name, descriptor) => {
     const isFuncDecorator = !!name;
     const _classType = isFuncDecorator ? target.constructor : target;

@@ -104,15 +104,17 @@ export default class Runtime {
     }
 
     compile() {
-        const filePaths = glob.sync(this._workspace);
+        if (this._workspace) {
+            const filePaths = glob.sync(this._workspace);
 
-        filePaths.forEach((relativePath) => {
-            // delete require.cache[require.resolve(module)];
-            // const absolutePath = path.join(process.cwd(), relativePath);
-            const _module = require.main.require(relativePath);    // eslint-disable-line
+            filePaths.forEach((relativePath) => {
+                // delete require.cache[require.resolve(module)];
+                // const absolutePath = path.join(process.cwd(), relativePath);
+                const _module = require.main.require(relativePath);    // eslint-disable-line
 
-            // register(_module.__esModule ? _module.default : _module, absolutePath);
-        });
+                // register(_module.__esModule ? _module.default : _module, absolutePath);
+            });
+        }
     }
 
     link() {

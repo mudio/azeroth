@@ -26,21 +26,13 @@ const __interceptorCache = {};
  * @param {IMiddleware} classType
  */
 export const registerMiddleware = (classType) => {
-    const [name] = classType[MiddlewareCategory];
-    // 匿名服务
-    if (!name) {
-        const index = _.findIndex(__middlewareCache, _Type => classType === _Type);
+    const index = _.findIndex(__middlewareCache, _Type => classType === _Type);
 
-        if (index > -1) {
-            __middlewareCache[index] = classType;
-        } else {
-            __middlewareCache.push(classType);
-        }
-
-        return;
+    if (index > -1) {
+        __middlewareCache[index] = classType;
+    } else {
+        __middlewareCache.push(classType);
     }
-
-    __middlewareCache[name] = classType;
 };
 
 /**
@@ -113,7 +105,7 @@ export const register = (classType, ...args) => {
 };
 
 export const getServiceRepository = () => __serviceCache;
-export const getMiddlewareRepository = () => Object.values(__middlewareCache);
+export const getMiddlewareRepository = () => __middlewareCache;
 export const getControllerRepository = () => __controllerCache;
 export const getInterceptor = name => __interceptorCache[name];
 

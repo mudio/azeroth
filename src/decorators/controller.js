@@ -6,6 +6,7 @@
  */
 
 import _ from 'lodash';
+import path from 'path';
 
 import {RouteKeys} from '../types';
 import {registerController} from '../context';
@@ -16,14 +17,12 @@ export default (rule = '/') => (Constructor, name) => {
     }
 
     /**
-     * `Rule` String|Array<String>|Func
-     *
-     * 最终以`Array<String>|Func`形式保存
+     * `Rule` String|Func
      */
-    if (_.isArray(rule) || _.isFunction(rule)) {
+    if (_.isFunction(rule)) {
         Constructor[RouteKeys] = rule;
     } else if (_.isString(rule)) {
-        Constructor[RouteKeys] = _.compact(rule.split('/'));
+        Constructor[RouteKeys] = path.normalize(rule);
     } else {
         throw new Error('Decorator `Controller` `Rule` must be String|Array|Func');
     }

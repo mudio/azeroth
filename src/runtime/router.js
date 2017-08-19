@@ -6,6 +6,7 @@
  */
 
 import _ from 'lodash';
+import path from 'path';
 
 import Processor from './processor';
 import {isNullValue} from '../utils';
@@ -39,8 +40,8 @@ export default class Router {
                 return this.findAction(_classType, req, res);
             }
 
-            const prefixs = pathname.split('/').slice(1, 1 + routeHandler.length);
-            const isMatch = _.every(routeHandler, (v, k) => prefixs[k] === v);
+            const isMatch = pathname.startsWith(routeHandler)
+                && pathname.substr(routeHandler.length).startsWith('/');
 
             if (isMatch) {
                 return this.findAction(_classType, req, res);
@@ -63,20 +64,20 @@ export default class Router {
         const pathname = req.url;
         const method = req.method;
         const routeHandler = _classType[RouteKeys];
-        const handlers = _classType[Symbol.for(method)];
+        const handlers = _classType[Symbol.for(method)] || [];
         const controller = Processor.Autowire(_classType, req, res);
 
         for (let index = 0; index < handlers.length; index += 1) {
-            const {match, key} = handlers[index];
+            const [key, option = {}] = handlers[index];
             /**
              * 如果是函数，则执行匹配
              */
-            if (_.isFunction(match) && match(pathname)) {
+            if (_.isFunction(option.optionmatch) && option.match(pathname)) {
                 return this.invokeAction(controller, key, req, res);
             }
 
-            if (_.isArray(routeHandler)) {
-                const targetUrl = ['', ...routeHandler, ...match].join('/');
+            if (_.isString(routeHandler) && _.isString(option.match)) {
+                const targetUrl = path.join(routeHandler, option.match);
                 if (targetUrl === pathname) {
                     return this.invokeAction(controller, key, req, res);
                 }
@@ -88,7 +89,7 @@ export default class Router {
 
     invokeAction(target, key, req, res) {
         const _classType = target.constructor;
-        const category = _classType[InterceptorKeys];
+        const category = _classType[InterceptorKeys] || [];
         const actionCategory = category[key] || [];
 
         const interceptors = _.uniqBy([...actionCategory, ...category], item => item[0]);

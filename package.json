@@ -2,13 +2,16 @@
   "name": "azeroth",
   "version": "1.0.0",
   "description": "Node web framework",
-  "main": "dist/",
+  "main": "src/",
   "scripts": {
+    "lint": "eslint src",
     "debug": "node -r babel-register index.js",
-    "build": "babel src -d dist -s",
-    "lint": "eslint src"
+    "test": "mocha --compilers js:babel-core/register --reporter spec --bail --check-leaks 'test/**/*.js'",
+    "test-cov": "nyc --reporter=text npm test",
+    "test-travis": "nyc --reporter=html --reporter=text npm test"
   },
   "author": "job.zhanghao@gmail.com",
+  "repository": "mudio/azeroth",
   "license": "MIT",
   "dependencies": {
     "connect": "^3.6.3",
@@ -24,8 +27,16 @@
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.24.1",
+    "chai": "^4.1.1",
     "eslint": "^4.3.0",
     "eslint-config-airbnb-base": "^11.3.1",
-    "eslint-plugin-import": "^2.7.0"
+    "eslint-plugin-import": "^2.7.0",
+    "mocha": "^3.5.0",
+    "node-mocks-http": "^1.6.4",
+    "nyc": "^11.1.0",
+    "supertest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">= 7.x"
   }
 }

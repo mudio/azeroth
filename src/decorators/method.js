@@ -6,20 +6,24 @@
  */
 
 import _ from 'lodash';
+import path from 'path';
 import {isController} from '../types';
 
 const invokeMethod = (method, rule) => (target, name, descriptor) => {
     const _classType = target.constructor;
+    /**
+     * handlerMapping Array<String, Any>
+     */
     const handlerMapping = _classType[Symbol.for(method)] || [];
 
     if (!isController(_classType)) {
         throw new Error(`Decorator '${method.toUpperCase()}' only support Controller`);
     }
 
-    if (_.isArray(rule) || _.isFunction(rule)) {
-        handlerMapping.push({match: rule, key: name});
+    if (_.isFunction(rule)) {
+        handlerMapping.push([name, {match: rule}]);
     } else if (_.isString(rule)) {
-        handlerMapping.push({match: _.compact(rule.split('/')), key: name});
+        handlerMapping.push([name, {match: path.normalize(rule)}]);
     } else {
         throw new Error(`Decorator \`${method}\` \`Rule\` must be String|Array|Func`);
     }
