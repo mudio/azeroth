@@ -22,8 +22,8 @@ import Middleware from '../src/decorators/middleware';
 import Controller from '../src/decorators/controller';
 import Interceptor from '../src/decorators/interceptor';
 
-describe('test context', () => {
-    it('test registerMiddleware', () => {
+describe('Test context', () => {
+    it('Test registerMiddleware', () => {
         @Middleware()
         class AnonymousMiddleware extends IMiddleware {
         }
@@ -50,7 +50,7 @@ describe('test context', () => {
         assert.notEqual(foundAnonymous, undefined, 'Anonymous middleware err!');
     });
 
-    it('test registerService', () => {
+    it('Test registerService', () => {
         @Service('$sevicename')
         class TestService extends IService {
         }
@@ -64,7 +64,7 @@ describe('test context', () => {
         assert.ok(repository.$sevicename === TestService);
     });
 
-    it('test registerServiceAlias', () => {
+    it('Test registerServiceAlias', () => {
         @Service('$sevicename')
         class TestService extends IService {
         }
@@ -81,7 +81,7 @@ describe('test context', () => {
         assert.ok(repository.$auth === repository.$sevicename);
     });
 
-    it('test registerController', () => {
+    it('Test registerController', () => {
         @Controller()
         class TestController extends IController {
         }
@@ -96,7 +96,7 @@ describe('test context', () => {
         assert.notEqual(foundController, undefined);
     });
 
-    it('test registerInterceptor', () => {
+    it('Test registerInterceptor', () => {
         @Interceptor('$interceptor')
         class TestInterceptor extends IInterceptor {
         }

@@ -37,14 +37,14 @@ export default class Router {
             const routeHandler = _classType[RouteKeys];
 
             if (_.isFunction(routeHandler) && routeHandler(pathname)) {
-                return this.findAction(_classType, req, res);
+                return this.execute(_classType, req, res);
             }
 
             const isMatch = pathname.startsWith(routeHandler)
                 && pathname.substr(routeHandler.length).startsWith('/');
 
             if (isMatch) {
-                return this.findAction(_classType, req, res);
+                return this.execute(_classType, req, res);
             }
         }
 
@@ -52,41 +52,66 @@ export default class Router {
     }
 
     /**
-     * 根据匹配规则分发到Action
+     * 执行Controller
      *
-     * @param {IController} _classType
+     * @param {IController} _Controller
      * @param {HttpRequest} req
      * @param {HttpResponse} res
      * @returns
      * @memberof Router
      */
-    findAction(_classType, req, res) {
-        const pathname = req.url;
-        const method = req.method;
-        const routeHandler = _classType[RouteKeys];
-        const handlers = _classType[Symbol.for(method)] || [];
-        const controller = Processor.Autowire(_classType, req, res);
+    execute(_Controller, req, res) {
+        const controller = Processor.Autowire(_Controller, req, res);
+        const actionKey = this.findAction(_Controller, req.url, req.method);
 
-        for (let index = 0; index < handlers.length; index += 1) {
-            const [key, option = {}] = handlers[index];
-            /**
-             * 如果是函数，则执行匹配
-             */
-            if (_.isFunction(option.optionmatch) && option.match(pathname)) {
-                return this.invokeAction(controller, key, req, res);
-            }
-
-            if (_.isString(routeHandler) && _.isString(option.match)) {
-                const targetUrl = path.join(routeHandler, option.match);
-                if (targetUrl === pathname) {
-                    return this.invokeAction(controller, key, req, res);
-                }
-            }
+        if (actionKey) {
+            return this.invokeAction(controller, actionKey, req, res);
         }
 
         return new Http405();
     }
 
+    /**
+     * 根据匹配规则分发到Action
+     *
+     * @param {IController} _Controller
+     * @param {String}      pathname
+     * @param {String}      method
+     * @returns
+     * @memberof Router
+     */
+    findAction(_Controller, pathname, method) {
+        const _routeKeys = _Controller[RouteKeys];
+        const _methodKeys = _Controller[Symbol.for(method)] || [];
+
+        for (let index = 0; index < _methodKeys.length; index += 1) {
+            const [key, option = {}] = _methodKeys[index];
+            /**
+             * 如果是函数，则执行匹配
+             */
+            if (_.isFunction(option.optionmatch) && option.match(pathname)) {
+                return key;
+            }
+
+            if (_.isString(_routeKeys) && _.isString(option.match)) {
+                const targetUrl = path.join(_routeKeys, option.match);
+                if (targetUrl === pathname) {
+                    return key;
+                }
+            }
+        }
+    }
+
+    /**
+     * 执行Action
+     *
+     * @param {Controller}      target
+     * @param {String}          key
+     * @param {HttpRequest}     req
+     * @param {HttpResponse}    res
+     * @returns
+     * @memberof Router
+     */
     invokeAction(target, key, req, res) {
         const _classType = target.constructor;
         const category = _classType[InterceptorKeys] || [];

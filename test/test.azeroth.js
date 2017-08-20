@@ -4,8 +4,8 @@ import request from 'supertest';
 
 import {runServer} from '../';
 
-describe('test azeroth', (done) => {
-    it('test runServer', () => {
+describe('Test azeroth', (done) => {
+    it('Test runServer', () => {
         runServer(8888).then((server) => {
             request(server)
                 .get('/')

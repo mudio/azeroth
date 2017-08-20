@@ -5,8 +5,8 @@ import {assert} from 'chai';
 
 import {httpcode} from '..';
 
-describe('test httpcode', () => {
-    it('test httpcode', () => {
+describe('Test httpcode', () => {
+    it('Test httpcode', () => {
         Object.keys(httpcode).forEach((key) => {
             const code = new httpcode[key]('Message');
             assert.ok(_.isError(code));

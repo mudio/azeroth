@@ -22,8 +22,8 @@ import {
     PostMethod, GetMethod, PutMethod, DeleteMethod,
 } from '../src/decorators/method';
 
-describe('test decorators', () => {
-    it('test Autowired', () => {
+describe('Test decorators', () => {
+    it('Test Autowired', () => {
         @Autowired('$uuap', '$log')
         class TestAutowired {}
 
@@ -32,15 +32,16 @@ describe('test decorators', () => {
         assert.equal(TestAutowired[AutowiredKeys][1], '$log');
     });
 
-    it('test Service', () => {
+    it('Test Service', () => {
         @Service('$uuap')
-        class TestService {}
+        class TestService {
+        }
 
         assert.property(TestService, ServiceCategory);
         assert.equal(TestService[ServiceCategory], '$uuap');
     });
 
-    it('test Middleware', () => {
+    it('Test Middleware', () => {
         @Middleware('$uuap')
         class TestMiddleware {}
 
@@ -53,7 +54,7 @@ describe('test decorators', () => {
         assert.equal(TestMiddleware2[MiddlewareCategory][1], false);
     });
 
-    it('test Controller', () => {
+    it('Test Controller', () => {
         @Controller()
         class TestController {}
 
@@ -64,9 +65,14 @@ describe('test decorators', () => {
         class TestController2 {}
 
         assert.equal(TestController2[RouteKeys], 'api/get');
+
+        @Controller(() => true)
+        class TestController3 {}
+
+        assert.isFunction(TestController3[RouteKeys]);
     });
 
-    it('test Interceptor', () => {
+    it('Test Interceptor', () => {
         @Interceptor('$interceptor')
         class TestInterceptor extends IInterceptor {}
 
@@ -89,7 +95,7 @@ describe('test decorators', () => {
         assert.equal(TestController2[InterceptorKeys].getmehod[1], '$interceptor2');
     });
 
-    it('test Method', () => {
+    it('Test Method', () => {
         class GetController extends IController {
             @GetMethod('/')
             getmethod() {}

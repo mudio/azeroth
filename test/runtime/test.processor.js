@@ -12,7 +12,7 @@ import Interceptor from '../../src/decorators/interceptor';
 
 import Processor from '../../src/runtime/processor';
 
-describe('test Processor', () => {
+describe('Test Processor', () => {
     const $basename = Symbol('$base');
     const $uuapname = Symbol('$uuap');
 
@@ -35,7 +35,7 @@ describe('test Processor', () => {
     @Interceptor('$interceptor')
     class TestInterceptor extends IInterceptor {}
 
-    it('test AutowireController', () => {
+    it('Test AutowireController', () => {
         const httpresponse = {setHeader: (key, value) => {
             assert.equal(key, 'key');
             assert.equal(value, 'value');
@@ -47,21 +47,21 @@ describe('test Processor', () => {
         assert.instanceOf(controller[$uuapname], TestService);
     });
 
-    it('test AutowireMiddleware', () => {
+    it('Test AutowireMiddleware', () => {
         const _ClasType = Processor.Autowire(TestMiddleware);
 
         assert.ok(_ClasType === TestMiddleware);
         assert.instanceOf(_ClasType[$uuapname], TestService);
     });
 
-    it('test AutowireInterceptor', () => {
+    it('Test AutowireInterceptor', () => {
         const interceptor = Processor.Autowire(TestInterceptor);
 
         assert.instanceOf(interceptor, TestInterceptor);
         assert.instanceOf(interceptor[$uuapname], TestService);
     });
 
-    it('test AutowireService', () => {
+    it('Test AutowireService', () => {
         const service = Processor.Autowire(TestService);
 
         assert.instanceOf(service, TestService);

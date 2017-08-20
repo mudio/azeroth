@@ -10,11 +10,21 @@ import {Http404, Http405} from '../../src/httpcode';
 import Controller from '../../src/decorators/controller';
 import {getControllerRepository} from '../../src/context';
 import {GetMethod, PostMethod} from '../../src/decorators/method';
+import Interceptor from '../../src/decorators/interceptor';
+import IInterceptor from '../../src/interface/interceptor';
 // 清理缓存
 getControllerRepository().length = 0;
 
 describe('Test Router', () => {
     const _router = new Router();
+    const interceptorKey = 'interceptor';
+
+    @Interceptor(interceptorKey)
+    class TestInterceptor extends IInterceptor { // eslint-disable-line no-unused-vars
+        before() {
+            return {intercept: true};
+        }
+    }
 
     @Controller('/api')
     class GetController extends IController { // eslint-disable-line no-unused-vars
@@ -25,6 +35,12 @@ describe('Test Router', () => {
 
         @PostMethod('/post')
         postmethod() {}
+
+        @GetMethod('/interceptor')
+        @Interceptor(interceptorKey)
+        testinterceptor() {
+            return {result: 'testinterceptor'};
+        }
     }
 
     it('Test dispatch 404', () => {
@@ -51,6 +67,15 @@ describe('Test Router', () => {
 
         return _router.dispatch(request, response).then((content) => {
             assert.equal(content.result, 'get');
+        });
+    });
+
+    it('Test dispatch with interceptor not pass', () => {
+        const request = httpMocks.createRequest({method: 'GET', url: '/api/interceptor'});
+        const response = httpMocks.createResponse();
+
+        return _router.dispatch(request, response).then((content) => {
+            assert.ok(content.intercept);
         });
     });
 });
