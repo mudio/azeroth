@@ -18,7 +18,9 @@
             ],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": null,
-            "env": { "NODE_ENV": "testing"}
+            "env": {
+                "NODE_ENV": "testing"
+            }
           }
     ]
 }

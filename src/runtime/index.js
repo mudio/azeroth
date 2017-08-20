@@ -200,7 +200,7 @@ export default class Runtime {
             info(
                 [
                     `load controller => ${_controller.name}`,
-                    `path = ${['', ...category].join('/')}`,
+                    `path = ${category}`,
                 ].join(', '),
             );
         });

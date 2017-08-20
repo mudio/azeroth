@@ -5,14 +5,12 @@ import {assert} from 'chai';
 
 import {
     RouteKeys,
-    HeaderKeys,
     AutowiredKeys,
     InterceptorKeys,
     ServiceCategory,
     MiddlewareCategory,
     InterceptorCategory,
 } from '../src/types';
-import Header from '../src/decorators/header';
 import Service from '../src/decorators/service';
 import Autowired from '../src/decorators/autowired';
 import Middleware from '../src/decorators/middleware';
@@ -25,15 +23,6 @@ import {
 } from '../src/decorators/method';
 
 describe('test decorators', () => {
-    it('test Header', () => {
-        @Header('key', 'value')
-        class TestHeader {}
-
-        assert.property(TestHeader, HeaderKeys);
-        assert.property(TestHeader[HeaderKeys], 'key');
-        assert.equal(TestHeader[HeaderKeys].key, 'value');
-    });
-
     it('test Autowired', () => {
         @Autowired('$uuap', '$log')
         class TestAutowired {}

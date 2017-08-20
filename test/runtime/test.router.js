@@ -17,7 +17,7 @@ describe('Test Router', () => {
     const _router = new Router();
 
     @Controller('/api')
-    class GetController extends IController {
+    class GetController extends IController { // eslint-disable-line no-unused-vars
         @GetMethod('/get')
         getmethod() {
             return {result: 'get'};
@@ -45,13 +45,12 @@ describe('Test Router', () => {
         assert.instanceOf(content, Http405);
     });
 
-    it('Test dispatch 200', (done) => {
+    it('Test dispatch 200', () => {
         const request = httpMocks.createRequest({method: 'GET', url: '/api/get'});
         const response = httpMocks.createResponse();
 
-        _router.dispatch(request, response).then((content) => {
+        return _router.dispatch(request, response).then((content) => {
             assert.equal(content.result, 'get');
-            done();
         });
     });
 });

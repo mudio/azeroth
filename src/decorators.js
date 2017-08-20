@@ -5,7 +5,6 @@
  * @author mudio(job.mudio@gmail.com)
  */
 
-import _header from './decorators/header';
 import _service from './decorators/service';
 import _autowired from './decorators/autowired';
 import _middleware from './decorators/middleware';
@@ -15,7 +14,6 @@ import {
     PostMethod, GetMethod, PutMethod, DeleteMethod,
 } from './decorators/method';
 
-export const Header = _header;
 export const Get = GetMethod;
 export const Post = PostMethod;
 export const Put = PutMethod;

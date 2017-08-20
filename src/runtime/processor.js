@@ -12,7 +12,7 @@ import {
     isController,
     isMiddleware,
     isInterceptor,
-    AutowiredKeys, HeaderKeys,
+    AutowiredKeys,
 } from '../types';
 import {error} from '../logger';
 import {getServiceRepository} from '../context';
@@ -20,24 +20,6 @@ import {getServiceRepository} from '../context';
 const __serviceCache = getServiceRepository();
 
 export default class Processor {
-    /**
-     * 自动装配Header装饰器
-     *
-     * @static
-     * @param {Controller} instance
-     * @returns
-     * @memberof Processor
-     */
-    static AutowireHttpHeader(instance) {
-        if (HeaderKeys in instance.constructor) {
-            _.each(instance.constructor[HeaderKeys], (value, key) => {
-                instance.response.setHeader(key, value);
-            });
-        }
-
-        return instance;
-    }
-
     /**
      * 自动装配服务
      *
@@ -76,8 +58,7 @@ export default class Processor {
      */
     static Autowire(ClassType, ...args) {
         if (isController(ClassType)) {
-            const instance = Processor.AutowireService(ClassType, ...args);
-            return Processor.AutowireHttpHeader(instance);
+            return Processor.AutowireService(ClassType, ...args);
         }
 
         if (isMiddleware(ClassType)) {

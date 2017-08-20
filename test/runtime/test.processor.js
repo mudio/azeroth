@@ -4,7 +4,6 @@ import {assert} from 'chai';
 
 import {IMiddleware, IController, IService, IInterceptor} from '../..';
 
-import Header from '../../src/decorators/header';
 import Service from '../../src/decorators/service';
 import Autowire from '../../src/decorators/autowired';
 import Middleware from '../../src/decorators/middleware';
@@ -26,7 +25,6 @@ describe('test Processor', () => {
 
     @Controller('/')
     @Autowire($uuapname)
-    @Header('key', 'value')
     class TestController extends IController {}
 
     @Autowire($uuapname)
