@@ -20,8 +20,8 @@ describe('Test Interface', () => {
         const _controller = new Controller(Symbol.for('request'), Symbol.for('response'));
 
         assert.property(Controller, ControllerCategory);
-        assert.equal(_controller.request, Symbol.for('request'));
-        assert.equal(_controller.response, Symbol.for('response'));
+        assert.equal(_controller._request, Symbol.for('request'));
+        assert.equal(_controller._response, Symbol.for('response'));
     });
 
     it('Test Interceptor', () => {
