@@ -7,7 +7,6 @@
 
 import _ from 'lodash';
 
-import {normalizeArgs} from '../utils';
 import {registerInterceptor} from '../context';
 import {
     isController,
@@ -28,24 +27,21 @@ export default (...args) => (target, name, descriptor) => {
      * 如果挂载在`Controller`上，则装配拦截器
      */
     if (isController(_classType)) {
-        const _args = normalizeArgs(...args);
         const categoryMap = _classType[InterceptorKeys] || [];
 
-        _args.forEach((category) => {
-            if (isFuncDecorator) {
-                const methodCategoryMap = categoryMap[name] || [];
-                methodCategoryMap.push(category);
-                categoryMap[name] = methodCategoryMap;
-            } else {
-                const index = _.findIndex(categoryMap, ([key]) => key === category[0]);
+        if (isFuncDecorator) {
+            const methodCategoryMap = categoryMap[name] || [];
+            methodCategoryMap.unshift(args);
+            categoryMap[name] = methodCategoryMap;
+        } else {
+            const index = _.findIndex(categoryMap, ([key]) => key === category[0]);
 
-                if (index > -1) {
-                    categoryMap[index] = category;
-                } else {
-                    categoryMap.push(category);
-                }
+            if (index > -1) {
+                categoryMap[index] = args;
+            } else {
+                categoryMap.unshift(args);
             }
-        });
+        }
 
         _classType[InterceptorKeys] = categoryMap;
 

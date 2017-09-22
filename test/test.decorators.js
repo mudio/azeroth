@@ -48,7 +48,7 @@ describe('Test decorators', () => {
         assert.property(TestMiddleware, MiddlewareCategory);
         assert.equal(TestMiddleware[MiddlewareCategory][0], '$uuap');
 
-        @Middleware(['$uuap', false])
+        @Middleware('$uuap', false)
         class TestMiddleware2 {}
 
         assert.equal(TestMiddleware2[MiddlewareCategory][1], false);
@@ -87,7 +87,8 @@ describe('Test decorators', () => {
         assert.notEqual(foundInterceptor, undefined);
 
         class TestController2 extends IController {
-            @Interceptor('$interceptor1', '$interceptor2')
+            @Interceptor('$interceptor1')
+            @Interceptor('$interceptor2')
             getmehod() {}
         }
 

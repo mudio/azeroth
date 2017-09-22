@@ -28,7 +28,7 @@ describe('Test context', () => {
         class AnonymousMiddleware extends IMiddleware {
         }
 
-        @Middleware(['@api', {path: '/api'}])
+        @Middleware('@api', {path: '/api'})
         class ApiMiddleware extends IMiddleware {
         }
 
