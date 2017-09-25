@@ -30,7 +30,7 @@ export default (...args) => (target, name, descriptor) => {
             methodCategoryMap.unshift(args);
             categoryMap[name] = methodCategoryMap;
         } else {
-            const index = _.findIndex(categoryMap, ([key]) => key === category[0]);
+            const index = _.findIndex(categoryMap, ([key]) => key === args[0]);
 
             if (index > -1) {
                 categoryMap[index] = args;

@@ -5,8 +5,6 @@
  * @author mudio(job.mudio@gmail.com)
  */
 
-import _ from 'lodash';
-
 import {
     isService,
     isController,
