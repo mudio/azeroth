@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import _ from 'lodash';
 import {assert} from 'chai';
 import httpMocks from 'node-mocks-http';
 

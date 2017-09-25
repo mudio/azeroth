@@ -50,7 +50,11 @@ export default class IController {
      * @memberof IController
      */
     setCookie(name, value, options = {}) {
-        this._response.setHeader('Set-Cookie', cookie.serialize(name, value, options));
+        const cookies = this._response.getHeader('Set-Cookie') || [];
+
+        cookies.push(cookie.serialize(name, value, options));
+
+        this._response.setHeader('Set-Cookie', cookies);
     }
 
     /**
