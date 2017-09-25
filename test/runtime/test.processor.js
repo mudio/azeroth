@@ -5,7 +5,7 @@ import {assert} from 'chai';
 import {IMiddleware, IController, IService, IInterceptor} from '../..';
 
 import Service from '../../src/decorators/service';
-import Autowire from '../../src/decorators/autowired';
+import AutoInject from '../../src/decorators/invoke';
 import Middleware from '../../src/decorators/middleware';
 import Controller from '../../src/decorators/controller';
 import Interceptor from '../../src/decorators/interceptor';
@@ -20,22 +20,22 @@ describe('Test Processor', () => {
     class BaseService extends IService {}
 
     @Service($uuapname)
-    @Autowire($basename)
+    @AutoInject($basename)
     class TestService extends IService {}
 
     @Controller('/')
-    @Autowire($uuapname)
+    @AutoInject($uuapname)
     class TestController extends IController {}
 
-    @Autowire($uuapname)
+    @AutoInject($uuapname)
     @Middleware('$uuap')
     class TestMiddleware extends IMiddleware {}
 
-    @Autowire($uuapname)
+    @AutoInject($uuapname)
     @Interceptor('$interceptor')
     class TestInterceptor extends IInterceptor {}
 
-    it('Test AutowireController', () => {
+    it('Test AutoInjectController', () => {
         const httpresponse = {setHeader: (key, value) => {
             assert.equal(key, 'key');
             assert.equal(value, 'value');
@@ -47,21 +47,21 @@ describe('Test Processor', () => {
         assert.instanceOf(controller[$uuapname], TestService);
     });
 
-    it('Test AutowireMiddleware', () => {
+    it('Test AutoInjectMiddleware', () => {
         const _ClasType = Processor.Autowire(TestMiddleware);
 
         assert.ok(_ClasType === TestMiddleware);
         assert.instanceOf(_ClasType[$uuapname], TestService);
     });
 
-    it('Test AutowireInterceptor', () => {
+    it('Test AutoInjectInterceptor', () => {
         const interceptor = Processor.Autowire(TestInterceptor);
 
         assert.instanceOf(interceptor, TestInterceptor);
         assert.instanceOf(interceptor[$uuapname], TestService);
     });
 
-    it('Test AutowireService', () => {
+    it('Test AutoInjectService', () => {
         const service = Processor.Autowire(TestService);
 
         assert.instanceOf(service, TestService);

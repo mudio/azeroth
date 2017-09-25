@@ -12,7 +12,7 @@ import {
     isController,
     isMiddleware,
     isInterceptor,
-    AutowiredKeys,
+    ServiceKeys,
 } from '../types';
 import {error} from '../logger';
 import {getServiceRepository} from '../context';
@@ -29,18 +29,18 @@ export default class Processor {
      * @returns
      * @memberof Processor
      */
-    static AutowireService(ClassType, ...args) {
+    static InjectService(ClassType, ...args) {
         const instance = new ClassType(...args);
 
-        if (AutowiredKeys in ClassType) {
-            ClassType[AutowiredKeys].forEach((name) => {
+        if (ServiceKeys in ClassType) {
+            ClassType[ServiceKeys].forEach((name) => {
                 const serviceClass = __serviceCache[name];
 
                 if (!serviceClass) {
                     return error(`Service ${name} not found!`);
                 }
 
-                instance[name] = Processor.AutowireService(serviceClass);
+                instance[name] = Processor.InjectService(serviceClass);
             });
         }
 
@@ -58,13 +58,13 @@ export default class Processor {
      */
     static Autowire(ClassType, ...args) {
         if (isController(ClassType)) {
-            return Processor.AutowireService(ClassType, ...args);
+            return Processor.InjectService(ClassType, ...args);
         }
 
         if (isMiddleware(ClassType)) {
-            if (AutowiredKeys in ClassType) {
-                ClassType[AutowiredKeys].forEach((name) => {
-                    ClassType[name] = Processor.AutowireService(__serviceCache[name]);
+            if (ServiceKeys in ClassType) {
+                ClassType[ServiceKeys].forEach((name) => {
+                    ClassType[name] = Processor.InjectService(__serviceCache[name]);
                 });
             }
 
@@ -74,9 +74,9 @@ export default class Processor {
         if (isInterceptor(ClassType)) {
             const interceptor = new ClassType(...args);
 
-            if (AutowiredKeys in ClassType) {
-                ClassType[AutowiredKeys].forEach((name) => {
-                    interceptor[name] = Processor.AutowireService(__serviceCache[name]);
+            if (ServiceKeys in ClassType) {
+                ClassType[ServiceKeys].forEach((name) => {
+                    interceptor[name] = Processor.InjectService(__serviceCache[name]);
                 });
             }
 
@@ -84,9 +84,9 @@ export default class Processor {
         }
 
         if (isService(ClassType)) {
-            return Processor.AutowireService(ClassType, ...args);
+            return Processor.InjectService(ClassType, ...args);
         }
 
-        throw new Error('Autowire only support `Controller`|`Service`|`Middleware`');
+        throw new Error('AutoInject only support `Controller`|`Service`|`Middleware`');
     }
 }

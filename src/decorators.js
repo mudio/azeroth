@@ -5,6 +5,7 @@
  * @author mudio(job.mudio@gmail.com)
  */
 
+import _invoke from './decorators/invoke';
 import _service from './decorators/service';
 import _autowired from './decorators/autowired';
 import _middleware from './decorators/middleware';
@@ -23,3 +24,4 @@ export const Autowired = _autowired;
 export const Middleware = _middleware;
 export const Controller = _controller;
 export const Interceptor = _interceptor;
+export const Invoke = _invoke;

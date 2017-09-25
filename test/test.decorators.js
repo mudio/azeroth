@@ -5,16 +5,17 @@ import {assert} from 'chai';
 
 import {
     RouteKeys,
-    AutowiredKeys,
+    ServiceKeys,
     InterceptorKeys,
     ServiceCategory,
     MiddlewareCategory,
     InterceptorCategory,
 } from '../src/types';
+import Invoke from '../src/decorators/invoke';
 import Service from '../src/decorators/service';
-import Autowired from '../src/decorators/autowired';
 import Middleware from '../src/decorators/middleware';
 import Controller from '../src/decorators/controller';
+import Autowired from '../src/decorators/autowired';
 import Interceptor from '../src/decorators/interceptor';
 import {IController, IInterceptor} from '..';
 
@@ -23,13 +24,13 @@ import {
 } from '../src/decorators/method';
 
 describe('Test decorators', () => {
-    it('Test Autowired', () => {
-        @Autowired('$uuap', '$log')
-        class TestAutowired {}
+    it('Test Invoke', () => {
+        @Invoke('$uuap', '$log')
+        class TestInvoke {}
 
-        assert.property(TestAutowired, AutowiredKeys);
-        assert.equal(TestAutowired[AutowiredKeys][0], '$uuap');
-        assert.equal(TestAutowired[AutowiredKeys][1], '$log');
+        assert.property(TestInvoke, ServiceKeys);
+        assert.equal(TestInvoke[ServiceKeys][0], '$uuap');
+        assert.equal(TestInvoke[ServiceKeys][1], '$log');
     });
 
     it('Test Service', () => {
@@ -79,7 +80,7 @@ describe('Test decorators', () => {
         assert.property(TestInterceptor, InterceptorCategory);
         assert.equal(TestInterceptor[InterceptorCategory], '$interceptor');
 
-        @Interceptor('$interceptor')
+        @Autowired('$interceptor')
         class TestController extends IController {}
 
         const foundInterceptor = _.find(TestController[InterceptorKeys], _Type => _Type[0] === '$interceptor');
@@ -87,8 +88,8 @@ describe('Test decorators', () => {
         assert.notEqual(foundInterceptor, undefined);
 
         class TestController2 extends IController {
-            @Interceptor('$interceptor1')
-            @Interceptor('$interceptor2')
+            @Autowired('$interceptor1')
+            @Autowired('$interceptor2')
             getmehod() {}
         }
 

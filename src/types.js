@@ -15,7 +15,7 @@ const assertType = (_type, category) => {
     return category in _type.constructor;
 };
 
-export const AutowiredKeys = Symbol.for('AutowiredKeys');
+export const ServiceKeys = Symbol.for('ServiceKeys');
 
 export const InterceptorKeys = Symbol.for('InterceptorKeys');
 

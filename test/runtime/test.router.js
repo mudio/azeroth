@@ -11,6 +11,7 @@ import Controller from '../../src/decorators/controller';
 import {getControllerRepository} from '../../src/context';
 import {GetMethod, PostMethod} from '../../src/decorators/method';
 import Interceptor from '../../src/decorators/interceptor';
+import Autowired from '../../src/decorators/autowired';
 import IInterceptor from '../../src/interface/interceptor';
 // 清理缓存
 getControllerRepository().length = 0;
@@ -37,7 +38,7 @@ describe('Test Router', () => {
         postmethod() {}
 
         @GetMethod('/interceptor')
-        @Interceptor(interceptorKey)
+        @Autowired(interceptorKey)
         testinterceptor() {
             return {result: 'testinterceptor'};
         }
