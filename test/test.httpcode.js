@@ -12,7 +12,12 @@ describe('Test httpcode', () => {
             assert.ok(_.isError(code));
             assert.equal(code.HttpCode, +key.match(/^Http([\d]{3})/)[1]);
             assert.typeOf(code.HttpMessage, 'string');
-            assert.equal(code.message, 'Message');
+
+            if (code.location) {
+                assert.equal(code.location, 'Message');
+            } else {
+                assert.equal(code.message, 'Message');
+            }
         });
     });
 });
