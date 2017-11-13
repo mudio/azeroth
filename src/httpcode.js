@@ -142,6 +142,12 @@ export class Http301 extends Error {
 }
 
 export class Http302 extends Error {
+    constructor(location = '/') {
+        super('Moved Temporarily');
+
+        this.location = location;
+    }
+
     get HttpCode() {
         return 302;
     }
