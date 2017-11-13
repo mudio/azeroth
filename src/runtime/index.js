@@ -12,9 +12,9 @@ import connect from 'connect';
 
 import Router from './router';
 import {info} from '../logger';
-import {Http500} from '../httpcode';
 import Processor from './processor';
 import {isHttpError} from '../utils';
+import {Http302, Http500} from '../httpcode';
 import {RouteKeys, MiddlewareCategory} from '../types';
 import {
     registerServiceAlias,
@@ -77,6 +77,7 @@ export default class Runtime {
          */
         app.use(async (req, res) => {
             let content = null;
+            const timestamp = Date.now();
 
             try {
                 content = await this._ruoter.dispatch(req, res);
@@ -90,14 +91,21 @@ export default class Runtime {
 
             if (!res.finished) {
                 if (isHttpError(content)) {
-                    res.writeHead(content.HttpCode);
-                    res.end(content.HttpMessage);
+                    switch (content.constructor) {
+                    case Http302:
+                        res.setHeader('Location', content.location);
+                    default: // eslint-disable-line no-fallthrough
+                        res.writeHead(content.HttpCode);
+                        res.end(content.HttpMessage);
+                    }
                 } else if (_.isObject(content)) {
                     res.end(JSON.stringify(content));
                 } else {
                     res.end(content || '');
                 }
             }
+
+            info(`execute => [${req.method}] ${req.url}, take time ${Date.now() - timestamp}ms`);
         });
 
         return Promise.resolve(http.createServer(app));

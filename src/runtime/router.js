@@ -5,6 +5,7 @@
  * @author mudio(job.mudio@gmail.com)
  */
 
+import URL from 'url';
 import _ from 'lodash';
 import path from 'path';
 
@@ -80,7 +81,8 @@ export default class Router {
      * @returns
      * @memberof Router
      */
-    findAction(_Controller, pathname, method) {
+    findAction(_Controller, url, method) {
+        const {pathname} = URL.parse(url);
         const _routeKeys = _Controller[RouteKeys];
         const _methodKeys = _Controller[Symbol.for(method)] || [];
 
@@ -89,7 +91,7 @@ export default class Router {
             /**
              * 如果是函数，则执行匹配
              */
-            if (_.isFunction(option.optionmatch) && option.match(pathname)) {
+            if (_.isFunction(option.optionmatch) && option.match(url)) {
                 return key;
             }
 
@@ -149,7 +151,9 @@ export default class Router {
                 return content;
             }
 
-            return target[key]();
+            const query = URL.parse(req.url, true, true);
+
+            return target[key](query);
         });
     }
 }
