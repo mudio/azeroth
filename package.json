@@ -2,9 +2,10 @@
   "name": "azeroth",
   "version": "1.0.0",
   "description": "Node web framework",
-  "main": "src/",
+  "main": "dist",
   "scripts": {
     "lint": "eslint src",
+    "build": "babel src -d dist",
     "debug": "node -r babel-register index.js",
     "test": "mocha --compilers js:babel-core/register --reporter spec --bail --check-leaks 'test/**/*.js'",
     "test-cov": "nyc --reporter=text npm test",
