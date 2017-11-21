@@ -11,7 +11,7 @@ import http from 'http';
 import connect from 'connect';
 
 import Router from './router';
-import {info} from '../logger';
+import {info, debug} from '../logger';
 import Processor from './processor';
 import {isHttpError} from '../utils';
 import {Http302, Http500} from '../httpcode';
@@ -85,6 +85,7 @@ export default class Runtime {
                 if (isHttpError(ex)) {
                     content = ex;
                 } else {
+                    debug(ex.message);
                     content = new Http500(ex.message);
                 }
             }
@@ -105,7 +106,11 @@ export default class Runtime {
                 }
             }
 
-            info(`execute => [${req.method}] ${req.url}, take time ${Date.now() - timestamp}ms`);
+            debug([
+                `execute => [${req.method}] ${req.url}`,
+                `code = ${res.statusCode}`,
+                `take time ${Date.now() - timestamp}ms`,
+            ].join(','));
         });
 
         return Promise.resolve(http.createServer(app));

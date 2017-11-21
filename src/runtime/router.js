@@ -8,6 +8,7 @@
 import URL from 'url';
 import _ from 'lodash';
 import path from 'path';
+import querystring from 'querystring';
 
 import Processor from './processor';
 import {isNullValue} from '../utils';
@@ -151,9 +152,25 @@ export default class Router {
                 return content;
             }
 
-            const query = URL.parse(req.url, true, true);
+            const {url, headers} = req;
 
-            return target[key](query);
+            const body = [];
+            const urlData = URL.parse(url, true, true);
+            const contentType = headers['content-type'] || '';
+
+            const _asyncRead = new Promise((resolve, reject) => {
+                req.on('data', chunked => body.push(chunked));
+                req.on('end', () => resolve(Buffer.concat(body).toString()));
+                req.on('error', err => reject(err));
+            });
+
+            return _asyncRead.then((bufferData) => {
+                const bodyData = contentType.indexOf('application/json') > -1
+                    ? JSON.parse(bufferData)
+                    : querystring.parse(bufferData);
+
+                return target[key]({url: urlData, body: bodyData});
+            });
         });
     }
 }
