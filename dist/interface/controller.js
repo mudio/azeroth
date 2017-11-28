@@ -12,6 +12,10 @@ var _class, _temp; /**
                     * @author mudio(job.mudio@gmail.com)
                     */
 
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 var _cookie = require('cookie');
 
 var _cookie2 = _interopRequireDefault(_cookie);
@@ -61,7 +65,9 @@ let IController = (_temp = _class = class IController {
      */
     setCookie(name, value, options = {}) {
         const cookies = this._response.getHeader('Set-Cookie') || [];
+        const [host] = this._request.headers.host.split(':');
 
+        options = _lodash2.default.defaults(options, { domain: host, path: '/' });
         cookies.push(_cookie2.default.serialize(name, value, options));
 
         this._response.setHeader('Set-Cookie', cookies);

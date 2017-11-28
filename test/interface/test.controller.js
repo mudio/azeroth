@@ -65,8 +65,8 @@ describe('Test Controller', () => {
 
         const [cookie1, cookie2] = response.getHeader('Set-Cookie');
 
-        assert.equal(cookie1, 'test1=test1; HttpOnly');
-        assert.equal(cookie2, 'test2=test2; Max-Age=604800');
+        assert.equal(cookie1, 'test1=test1; Path=/; HttpOnly');
+        assert.equal(cookie2, 'test2=test2; Max-Age=604800; Path=/');
     });
 
     it('Controller.redirect', () => {

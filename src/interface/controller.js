@@ -5,6 +5,7 @@
  * @author mudio(job.mudio@gmail.com)
  */
 
+import _ from 'lodash';
 import cookie from 'cookie';
 
 import {Http302} from '../httpcode';
@@ -51,7 +52,9 @@ export default class IController {
      */
     setCookie(name, value, options = {}) {
         const cookies = this._response.getHeader('Set-Cookie') || [];
+        const [host] = this._request.headers.host.split(':');
 
+        options = _.defaults(options, {domain: host, path: '/'});
         cookies.push(cookie.serialize(name, value, options));
 
         this._response.setHeader('Set-Cookie', cookies);
