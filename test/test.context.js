@@ -15,7 +15,7 @@ import {
     RouteKeys,
     MiddlewareCategory,
 } from '../src/types';
-import {IMiddleware, IController, IService, IInterceptor} from '..';
+import {IMiddleware, IController, IService, IInterceptor} from '../src/index';
 
 import Service from '../src/decorators/service';
 import Middleware from '../src/decorators/middleware';

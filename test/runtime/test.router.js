@@ -3,7 +3,7 @@
 import {assert} from 'chai';
 import httpMocks from 'node-mocks-http';
 
-import {IController} from '../..';
+import {IController} from '../../src/index';
 import Router from '../../src/runtime/router';
 import {Http404, Http405} from '../../src/httpcode';
 import Controller from '../../src/decorators/controller';
@@ -64,6 +64,8 @@ describe('Test Router', () => {
     it('Test dispatch 200', () => {
         const request = httpMocks.createRequest({method: 'GET', url: '/api/get'});
         const response = httpMocks.createResponse();
+
+        setTimeout(() => request.emit('end'), 0);
 
         return _router.dispatch(request, response).then((content) => {
             assert.equal(content.result, 'get');

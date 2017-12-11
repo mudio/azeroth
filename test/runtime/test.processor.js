@@ -2,7 +2,7 @@
 
 import {assert} from 'chai';
 
-import {IMiddleware, IController, IService, IInterceptor} from '../..';
+import {IMiddleware, IController, IService, IInterceptor} from '../../src/index';
 
 import Service from '../../src/decorators/service';
 import AutoInject from '../../src/decorators/invoke';

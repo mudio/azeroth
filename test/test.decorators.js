@@ -17,7 +17,7 @@ import Middleware from '../src/decorators/middleware';
 import Controller from '../src/decorators/controller';
 import Autowired from '../src/decorators/autowired';
 import Interceptor from '../src/decorators/interceptor';
-import {IController, IInterceptor} from '..';
+import {IController, IInterceptor} from '../src/index';
 
 import {
     PostMethod, GetMethod, PutMethod, DeleteMethod,
@@ -95,6 +95,13 @@ describe('Test decorators', () => {
 
         assert.equal(TestController2[InterceptorKeys].getmehod[0], '$interceptor1');
         assert.equal(TestController2[InterceptorKeys].getmehod[1], '$interceptor2');
+    });
+
+    it('Test Autowired throw error', () => {
+        assert.throws(() => {
+            @Autowired('$interceptor')
+            class TestInterceptor {}
+        }, Error);
     });
 
     it('Test Method', () => {

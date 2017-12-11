@@ -3,7 +3,7 @@
 import _ from 'lodash';
 import {assert} from 'chai';
 
-import {httpcode} from '..';
+import {httpcode} from '../src/index';
 
 describe('Test httpcode', () => {
     it('Test httpcode', () => {

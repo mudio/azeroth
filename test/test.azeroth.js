@@ -2,7 +2,7 @@
 
 import request from 'supertest';
 
-import {runServer} from '../';
+import {runServer} from '../src/index';
 
 describe('Test azeroth', (done) => {
     it('Test runServer', () => {

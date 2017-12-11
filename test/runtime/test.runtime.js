@@ -7,7 +7,7 @@ import Service from '../../src/decorators/service';
 import Middleware from '../../src/decorators/middleware';
 import Controller from '../../src/decorators/controller';
 import Interceptor from '../../src/decorators/interceptor';
-import {IMiddleware, IController, IService, IInterceptor} from '../..';
+import {IMiddleware, IController, IService, IInterceptor} from '../../src/index';
 
 describe('Test Runtime', () => {
     const _runtime = new Runtime({

@@ -52,7 +52,13 @@ describe('Test Controller', () => {
     });
 
     it('Controller.setCookie', () => {
-        const request = httpMocks.createRequest({method: 'GET', url: '/http404'});
+        const request = httpMocks.createRequest({
+            method: 'GET',
+            url: '/http404',
+            headers: {
+                host: 'localhost',
+            },
+        });
         const response = httpMocks.createResponse();
 
         class Controller extends IController {}
@@ -65,8 +71,8 @@ describe('Test Controller', () => {
 
         const [cookie1, cookie2] = response.getHeader('Set-Cookie');
 
-        assert.equal(cookie1, 'test1=test1; Path=/; HttpOnly');
-        assert.equal(cookie2, 'test2=test2; Max-Age=604800; Path=/');
+        assert.equal(cookie1, 'test1=test1; Domain=localhost; Path=/; HttpOnly');
+        assert.equal(cookie2, 'test2=test2; Max-Age=604800; Domain=localhost; Path=/');
     });
 
     it('Controller.redirect', () => {
